@@ -8,7 +8,22 @@ commands:
   sign:
     description: 為物品署名
     usage: /sign
+    permission: itemsigner.sign
 
   unsign:
     description: 移除物品署名
     usage: /unsign
+    permission: itemsigner.unsign
+
+permissions:
+  itemsigner.sign:
+    description: 允許玩家署名物品
+    default: true
+
+  itemsigner.unsign:
+    description: 允許移除自己的署名
+    default: true
+
+  itemsigner.unsign.other:
+    description: 允許移除其他人的署名
+    default: op
