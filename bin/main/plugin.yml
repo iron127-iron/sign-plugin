@@ -1,0 +1,14 @@
+name: ItemSigner
+version: 1.0
+main: me.www.itemsigner.ItemSignerPlugin
+api-version: '1.21'
+author: www
+
+commands:
+  sign:
+    description: 為物品署名
+    usage: /sign
+
+  unsign:
+    description: 移除物品署名
+    usage: /unsign
