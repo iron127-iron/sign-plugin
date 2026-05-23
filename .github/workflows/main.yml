@@ -1,0 +1,31 @@
+name: Build Paper Plugin
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 專案
+        uses: actions/checkout@v4
+
+      - name: 安裝 Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: 設定 Gradle 權限
+        run: chmod +x gradlew
+
+      - name: 編譯插件
+        run: ./gradlew build
+
+      - name: 上傳 Jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: ItemSigner
+          path: build/libs/*.jar
