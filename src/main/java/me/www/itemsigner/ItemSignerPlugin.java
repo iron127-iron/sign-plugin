@@ -42,39 +42,63 @@ public class ItemSignerPlugin extends JavaPlugin {
         ItemMeta meta = item.getItemMeta();
 
         if (meta == null) {
-            player.sendMessage(ChatColor.RED + "此物品無法署名！");
+            player.sendMessage(ChatColor.RED + "此物品無法使用！");
             return true;
         }
 
+        // =========================
         // /sign
+        // =========================
+
         if (command.getName().equalsIgnoreCase("sign")) {
+
+            if (!player.hasPermission("itemsigner.sign")) {
+                player.sendMessage(ChatColor.RED + "你沒有權限使用此指令！");
+                return true;
+            }
 
             List<String> lore = meta.hasLore()
                     ? new ArrayList<>(meta.getLore())
                     : new ArrayList<>();
 
+            // 檢查是否已署名
             for (String line : lore) {
-                if (ChatColor.stripColor(line).startsWith("✦ 來自：")) {
+
+                String stripped = ChatColor.stripColor(line);
+
+                if (stripped.startsWith("✦ 來自：")) {
                     player.sendMessage(ChatColor.RED + "這個物品已經署名過了！");
                     return true;
                 }
             }
 
             lore.add("");
-            lore.add(ChatColor.GOLD + "✦ "
-                    + ChatColor.GRAY + "來自："
-                    + ChatColor.AQUA + player.getName()
-                    + ChatColor.GOLD + " ✦");
+
+            lore.add(
+                    ChatColor.GOLD + "✦ "
+                            + ChatColor.GRAY + "來自："
+                            + ChatColor.AQUA + player.getName()
+                            + ChatColor.GOLD + " ✦"
+            );
 
             meta.setLore(lore);
             item.setItemMeta(meta);
 
             player.sendMessage(ChatColor.GREEN + "成功署名物品！");
+
             return true;
         }
 
+        // =========================
         // /unsign
+        // =========================
+
         if (command.getName().equalsIgnoreCase("unsign")) {
+
+            if (!player.hasPermission("itemsigner.unsign")) {
+                player.sendMessage(ChatColor.RED + "你沒有權限使用此指令！");
+                return true;
+            }
 
             if (!meta.hasLore()) {
                 player.sendMessage(ChatColor.RED + "此物品沒有署名！");
@@ -84,13 +108,33 @@ public class ItemSignerPlugin extends JavaPlugin {
             List<String> lore = new ArrayList<>(meta.getLore());
 
             boolean removed = false;
+            String owner = null;
 
             Iterator<String> iterator = lore.iterator();
 
             while (iterator.hasNext()) {
-                String line = ChatColor.stripColor(iterator.next());
 
-                if (line.startsWith("✦ 來自：")) {
+                String raw = iterator.next();
+                String stripped = ChatColor.stripColor(raw);
+
+                if (stripped.startsWith("✦ 來自：")) {
+
+                    owner = stripped
+                            .replace("✦ 來自：", "")
+                            .replace(" ✦", "")
+                            .trim();
+
+                    // 不是自己的署名
+                    if (!owner.equalsIgnoreCase(player.getName())) {
+
+                        // 沒有管理權限
+                        if (!player.hasPermission("itemsigner.unsign.other")) {
+
+                            player.sendMessage(ChatColor.RED + "你不能解除其他人的署名！");
+                            return true;
+                        }
+                    }
+
                     iterator.remove();
                     removed = true;
                 }
